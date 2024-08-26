@@ -11,7 +11,7 @@ def pcode_to_data(pcode):
     
     while True:
         try:
-            response = requests.get('http://developers.onemap.sg/commonapi/search?searchVal={0}&returnGeom=Y&getAddrDetails=Y&pageNum={1}'
+            response = requests.get('https://www.onemap.gov.sg/api/common/elastic/search?searchVal={0}&returnGeom=Y&getAddrDetails=Y&pageNum={1}'
                                     .format(pcode, page)) \
                                .json()
         except requests.exceptions.ConnectionError as e:
