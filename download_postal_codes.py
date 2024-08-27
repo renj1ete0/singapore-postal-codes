@@ -42,10 +42,9 @@ if __name__ == '__main__':
     postal_codes = ['{0:06d}'.format(p) for p in postal_codes]
 
     all_buildings = pool.map(pcode_to_data, postal_codes)
-    all_buildings.sort(key=lambda b: (b['POSTAL'], b['SEARCHVAL']))
-
-    jstr = json.dumps([y for x in all_buildings for y in x], indent=2, sort_keys=True)
+    all_buildings_flattened = [item for sublist in all_buildings[1:] for item in sublist]
+    all_buildings_flattened.sort(key=lambda b: (b['POSTAL'], b['SEARCHVAL']))
 
     with open('buildings.json', 'w') as f:
-        f.write(jstr.encode('utf-8'))
+        f.write(json.dumps(all_buildings_flattened, indent=2, sort_keys=True))
 
