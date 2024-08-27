@@ -5,28 +5,32 @@ from multiprocessing import Pool
 def pcode_to_data(pcode):
     if int(pcode) % 1000 == 0:
         print(pcode)
-    
     page = 1
     results = []
-    
-    while True:
+    outer_loop = True
+    inner_loop = True
+
+    while outer_loop:
         try:
-            response = requests.get('https://www.onemap.gov.sg/api/common/elastic/search?searchVal={0}&returnGeom=Y&getAddrDetails=Y&pageNum={1}'
-                                    .format(pcode, page)) \
-                               .json()
+            while inner_loop:
+                response_raw = requests.get('https://www.onemap.gov.sg/api/common/elastic/search?searchVal={0}&returnGeom=Y&getAddrDetails=Y&pageNum={1}'.format(pcode, page))
+                try:
+                    response = response_raw.json()
+                    inner_loop = False
+                except ValueError as e:
+                    print('Fetching {} failed due to invalid JSON. Retrying in 2 sec'.format(pcode))
+                    time.sleep(2)
+                
         except requests.exceptions.ConnectionError as e:
             print('Fetching {} failed. Retrying in 2 sec'.format(pcode))
-            
-            time.sleep(2)
-            continue
-            
+            time.sleep(2)    
+        
         results = results + response['results']
-    
         if response['totalNumPages'] > page:
             page = page + 1
         else:
-            break
-            
+            outer_loop = False
+
     return results
 
 import json
